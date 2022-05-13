@@ -1,0 +1,40 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      # Step 1: build the cargo container for everything
+      - run: cargo build --release
+      # Step 2: Upload
+      - uses: actions/upload-artifact@v3
+        name: Upload ${{ matrix.os }} artifacts
+        with:
+          name: ${{ matrix.os }}-build-artifact-${{ github.sha }}
+          path: |
+            target/release/*terminal*
+            !target/release/*terminal*.d
+  conglomerate:
+    name: Combine things
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v3
+        with:
+          path: target/
+      - run: mkdir -p libraries && cp target/**/*terminal* ./libraries
+      - name: Make full release artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-libs
+          path: libraries/
