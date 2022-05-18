@@ -1,6 +1,16 @@
 on:
   workflow_dispatch:
-
+    inputs:
+      dryRun:
+        description: Is this a dry run -- i.e. do NOT actually  run the command
+        required: false
+        type: boolean
+        default: false
+      firstRelease:
+        description: Is this the first release?
+        required: false
+        type: boolean
+        default: false
 jobs:
   build:
     strategy:
@@ -38,3 +48,18 @@ jobs:
         with:
           name: ${{ github.sha }}-libs
           path: libraries/
+  version-bump:
+    name: Version Bump
+    runs-on: ubuntu-latest
+    needs: conglomerate
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+      - run: deno install -A -n version-bump https://deno.land/x/version_bump/cli.ts
+        name: Install Version bump
+      - run: git config user.name "release bot" && git config user.email "jhechtf+release-bot@gmail.com"
+        name: Configure release bot user in git
+      - run: version-bump --firstRelease=${{ github.event.inputs.firstRelease }} --dryRun=${{ github.event.inputs.dryRun }}
+        name: run verison bump tool
+      - run: git push && git push --tags
+        if: ${{ github.event.inputs.dryRun == 'false' }}
