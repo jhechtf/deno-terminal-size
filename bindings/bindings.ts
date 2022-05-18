@@ -18,8 +18,8 @@ function readPointer(v: any): Uint8Array {
 }
 const opts = {
   name: "terminal",
-  url: (new URL("../target/release", import.meta.url)).toString(),
-  policy: undefined,
+  url: (new URL("../target/debug", import.meta.url)).toString(),
+  policy: CachePolicy.NONE,
 }
 const _lib = await prepare(opts, {
   getHeight: { parameters: [], result: "u16", nonblocking: false },

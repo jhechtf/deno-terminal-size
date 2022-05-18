@@ -1,3 +1,3 @@
 import * as terminal from './mod.ts';
 
-console.info(terminal.getHeight(), terminal.getWidth());
+console.info(terminal.getSize(), terminal.getHeight(), terminal.getWidth());
