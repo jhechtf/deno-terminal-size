@@ -18,7 +18,7 @@ function readPointer(v: any): Uint8Array {
 }
 const opts = {
   name: 'terminal',
-  url: (new URL('../target/release', import.meta.url)).toString(),
+  url: (new URL('https://github.com/jhechtf/deno-terminal-size/releases/download/0.1.0/', import.meta.url)).toString(),
   policy: undefined,
 };
 const _lib = await prepare(opts, {
